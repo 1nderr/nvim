@@ -417,6 +417,7 @@ vim.o.cursorline = true
 vim.o.ignorecase = true
 vim.o.inccommand = 'split'
 vim.o.mouse = 'a'
+vim.o.mousescroll = 'ver:1,hor:6'
 vim.o.number = true
 vim.o.relativenumber = true
 vim.o.scrolloff = 10
