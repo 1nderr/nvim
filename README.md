@@ -5,7 +5,7 @@ Personal Neovim configuration
 ## Clone
 
 ```sh
-git clone git@github.com:is386/nvim.git ~/.config/nvim
+git clone git@github.com:1nderr/nvim.git ~/.config/nvim
 ```
 
 ### Common
