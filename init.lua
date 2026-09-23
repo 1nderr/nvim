@@ -76,7 +76,7 @@ vim.filetype.add {
 }
 
 -- ============================================================
--- SECTION 2: DIAGNOSTIC, KEYMAPS & AUTOCMDS
+-- SECTION 2: DIAGNOSTIC
 -- ============================================================
 
 vim.diagnostic.config {
@@ -105,6 +105,13 @@ vim.api.nvim_create_autocmd('CursorHold', {
   group = vim.api.nvim_create_augroup('diagnostic-float', { clear = true }),
   callback = function() vim.diagnostic.open_float { scope = 'line', focus = false } end,
 })
+
+vim.keymap.set('n', '<leader>dn', ']d', { remap = true, desc = 'Diagnostic Next' })
+vim.keymap.set('n', '<leader>dN', '[d', { remap = true, desc = 'Diagnostic Previous' })
+
+-- ============================================================
+-- SECTION 3: GENERAL KEYMAPS & AUTOCMDS
+-- ============================================================
 
 -- nohlsearch turns off highlighting from the last search
 -- checktime checks if there buffer was modified outside of Vim
@@ -447,6 +454,7 @@ vim.keymap.set('n', '<leader>sa', function() builtin.live_grep { additional_args
 vim.keymap.set('n', '<leader>sr', builtin.oldfiles, { desc = 'Search Recent Files' })
 vim.keymap.set('n', '<leader>ss', builtin.lsp_document_symbols, { desc = 'Search Symbols' })
 vim.keymap.set('n', '<leader>sg', builtin.git_status, { desc = 'Search Git Changes' })
+vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = 'Search Diagnostics' })
 
 -- Which Key
 -- Progressively displays keymaps as you type them
@@ -461,7 +469,7 @@ require('which-key').setup {
   spec = {
     { '<leader>s', group = 'Search', mode = { 'n', 'v' } },
     { '<leader>g', group = 'Git' },
-    { '<leader>d', group = 'Split' },
+    { '<leader>d', group = 'Diagnostics' },
     { '<leader>i', group = 'Info' },
     { '<leader>c', group = 'Conflict' },
     { '<leader>r', group = 'Replace' },
@@ -505,13 +513,49 @@ conform.setup {
 -- Server configs, Mason, tool installation
 -- ============================================================
 
-vim.pack.add {
-  gh 'neovim/nvim-lspconfig',
-  gh 'b0o/schemastore.nvim',
-  gh 'mason-org/mason.nvim',
-  gh 'mason-org/mason-lspconfig.nvim',
-  gh 'WhoIsSethDaniel/mason-tool-installer.nvim',
-}
+-- This function gets executed every time a new file is opened that is associated with an LSP
+vim.api.nvim_create_autocmd('LspAttach', {
+  group = vim.api.nvim_create_augroup('lsp-attach', { clear = true }),
+  callback = function(event)
+    vim.keymap.set('n', 'gd', vim.lsp.buf.definition, { buffer = event.buf, desc = 'Go to Definition' })
+    vim.keymap.set('n', 'gD', builtin.lsp_references, { buffer = event.buf, desc = 'Go to Declaration' })
+    vim.keymap.set('n', '<leader><F2>', vim.lsp.buf.rename, { buffer = event.buf, desc = 'Rename' })
+    vim.keymap.set({ 'n', 'x' }, '<leader>.', vim.lsp.buf.code_action, { buffer = event.buf, desc = 'Code Actions' })
+    vim.keymap.set('n', '<leader>i', function() vim.lsp.buf.hover { max_width = 60 } end, { buffer = event.buf, desc = 'Show Info' })
+
+    -- The following autocommands are used to highlight references of the word
+    local client = vim.lsp.get_client_by_id(event.data.client_id)
+    if client and client:supports_method('textDocument/documentHighlight', event.buf) then
+      local highlight_augroup = vim.api.nvim_create_augroup('lsp-highlight', { clear = false })
+
+      -- If cursor is hovering over word, then highlight
+      vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
+        buffer = event.buf,
+        group = highlight_augroup,
+        callback = vim.lsp.buf.document_highlight,
+      })
+
+      -- If the cursor moves, then clear highlights
+      vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
+        buffer = event.buf,
+        group = highlight_augroup,
+        callback = vim.lsp.buf.clear_references,
+      })
+
+      -- If the LSP detaches, then clear highlights
+      vim.api.nvim_create_autocmd('LspDetach', {
+        group = vim.api.nvim_create_augroup('lsp-detach', { clear = true }),
+        callback = function(event2)
+          vim.lsp.buf.clear_references()
+          vim.api.nvim_clear_autocmds { group = 'lsp-highlight', buffer = event2.buf }
+        end,
+      })
+    end
+  end,
+})
+
+vim.pack.add { gh 'b0o/schemastore.nvim' }
+
 local servers = {
   basedpyright = {},
 
@@ -633,7 +677,10 @@ local servers = {
   },
 }
 
+-- Some LSPs/formatters are installed using the same binary, so this map helps with that
 local mason_name = { ruff_fix = 'ruff', ruff_format = 'ruff', ruff_organize_imports = 'ruff' }
+
+-- Builds a set of Mason package names by looking through the configured Conform formatters
 local formatters = {}
 for _, tools in pairs(conform.formatters_by_ft) do
   for _, tool in ipairs(tools) do
@@ -641,14 +688,29 @@ for _, tools in pairs(conform.formatters_by_ft) do
   end
 end
 
-local skip = { gdscript = true, gdshader = true }
-local ensure_installed = vim.tbl_filter(function(k) return not skip[k] end, vim.tbl_keys(servers or {}))
+-- Prefers the system installed C language formatter
 local prefer_system = { ['clang-format'] = true }
+
+-- A list of LSPs that Mason should not install since they may be installed elsewhere
+local skip = { gdscript = true, gdshader = true }
+
+-- Builds the final list of formatters and LSPs to install
+local ensure_installed = vim.tbl_filter(function(k) return not skip[k] end, vim.tbl_keys(servers or {}))
 for tool in pairs(formatters) do
   if not (prefer_system[tool] and vim.fn.executable(tool) == 1) then table.insert(ensure_installed, tool) end
 end
 
+vim.pack.add {
+  gh 'neovim/nvim-lspconfig',
+  gh 'mason-org/mason.nvim',
+  gh 'mason-org/mason-lspconfig.nvim',
+  gh 'WhoIsSethDaniel/mason-tool-installer.nvim',
+}
+
 require('mason').setup {}
+require('mason-lspconfig').setup {
+  automatic_enable = false,
+}
 require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
 for name, server in pairs(servers) do
@@ -656,47 +718,14 @@ for name, server in pairs(servers) do
   vim.lsp.enable(name)
 end
 
-vim.api.nvim_create_autocmd('LspAttach', {
-  group = vim.api.nvim_create_augroup('lsp-attach', { clear = true }),
-  callback = function(event)
-    vim.keymap.set('n', 'gd', vim.lsp.buf.definition, { buffer = event.buf, desc = 'Go to Definition' })
-    vim.keymap.set('n', 'gD', builtin.lsp_references, { buffer = event.buf, desc = 'Go to Declaration' })
-    vim.keymap.set('n', '<leader><F2>', vim.lsp.buf.rename, { buffer = event.buf, desc = 'Rename' })
-    vim.keymap.set({ 'n', 'x' }, '<leader>.', vim.lsp.buf.code_action, { buffer = event.buf, desc = 'Code Actions' })
-    vim.keymap.set('n', '<leader>i', function() vim.lsp.buf.hover { max_width = 60 } end, { buffer = event.buf, desc = 'Show Info' })
-
-    local client = vim.lsp.get_client_by_id(event.data.client_id)
-    if client and client:supports_method('textDocument/documentHighlight', event.buf) then
-      local highlight_augroup = vim.api.nvim_create_augroup('lsp-highlight', { clear = false })
-      vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
-        buffer = event.buf,
-        group = highlight_augroup,
-        callback = vim.lsp.buf.document_highlight,
-      })
-
-      vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
-        buffer = event.buf,
-        group = highlight_augroup,
-        callback = vim.lsp.buf.clear_references,
-      })
-
-      vim.api.nvim_create_autocmd('LspDetach', {
-        group = vim.api.nvim_create_augroup('lsp-detach', { clear = true }),
-        callback = function(event2)
-          vim.lsp.buf.clear_references()
-          vim.api.nvim_clear_autocmds { group = 'lsp-highlight', buffer = event2.buf }
-        end,
-      })
-    end
-  end,
-})
-
 -- Godot LSP setup
+-- Paths to check for project.godot file in the parent directory
 local paths_to_check = { '/', '/../' }
 local is_godot_project = false
 local godot_project_path = ''
 local cwd = vim.fn.getcwd()
 
+-- Iterate over paths and check
 for _, value in pairs(paths_to_check) do
   if vim.uv.fs_stat(cwd .. value .. 'project.godot') then
     is_godot_project = true
@@ -705,13 +734,6 @@ for _, value in pairs(paths_to_check) do
   end
 end
 
-if is_godot_project then
-  local pipe = vim.fs.normalize(godot_project_path .. '/server.pipe')
-  local ok, chan = pcall(vim.fn.sockconnect, 'pipe', pipe, { rpc = true })
-  if ok and chan ~= 0 then
-    pcall(vim.fn.chanclose, chan)
-  else
-    if vim.uv.fs_stat(pipe) then vim.uv.fs_unlink(pipe) end
-    vim.fn.serverstart(pipe)
-  end
-end
+-- Check if server is already running in godot project path and then start the server
+local is_server_running = vim.uv.fs_stat(godot_project_path .. '/server.pipe')
+if is_godot_project and not is_server_running then vim.fn.serverstart(godot_project_path .. '/server.pipe') end
