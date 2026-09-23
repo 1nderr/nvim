@@ -148,7 +148,7 @@ vim.api.nvim_create_autocmd({ 'FocusGained', 'BufEnter', 'CursorHold', 'CursorHo
 })
 
 -- ============================================================
--- SECTION 3: PLUGINS
+-- SECTION 4: PLUGINS
 -- ============================================================
 
 local function run_build(name, cmd, cwd)
@@ -190,7 +190,7 @@ local function gh(repo) return 'https://github.com/' .. repo end
 -- Saves after the buffer has been modified
 vim.pack.add { gh 'okuuva/auto-save.nvim' }
 require('auto-save').setup {
-  noautocmd = false, -- Keep this on only format on manual save
+  noautocmd = true, -- Keep this on to only format on manual save
 }
 
 vim.api.nvim_create_autocmd('User', {
@@ -509,7 +509,7 @@ conform.setup {
 }
 
 -- ============================================================
--- SECTION 4: LSP
+-- SECTION 5: LSP
 -- Server configs, Mason, tool installation
 -- ============================================================
 
