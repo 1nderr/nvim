@@ -465,6 +465,7 @@ vim.keymap.set('n', '<leader>sr', builtin.oldfiles, { desc = 'Search Recent File
 vim.keymap.set('n', '<leader>ss', builtin.lsp_document_symbols, { desc = 'Search Symbols' })
 vim.keymap.set('n', '<leader>sg', builtin.git_status, { desc = 'Search Git Changes' })
 vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = 'Search Diagnostics' })
+vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = 'Buffers' })
 
 -- Which Key
 -- Progressively displays keymaps as you type them
