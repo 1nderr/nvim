@@ -258,7 +258,9 @@ vim.api.nvim_create_autocmd('User', {
 -- LSP Signature
 -- Displays the function signature as you type the function out
 vim.pack.add { gh 'ray-x/lsp_signature.nvim' }
-require('lsp_signature').setup {}
+require('lsp_signature').setup {
+  hint_enable = false,
+}
 
 -- Markdown Preview
 -- Displays a markdown file in your web browser
