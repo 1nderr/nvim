@@ -204,11 +204,6 @@ vim.api.nvim_create_autocmd('User', {
   end,
 })
 
--- Barbar
--- Tab bar
-vim.pack.add { gh 'romgrk/barbar.nvim', gh 'nvim-tree/nvim-web-devicons' }
-require('barbar').setup {}
-
 -- Blink
 -- Code auto-complete
 vim.pack.add { { src = gh 'saghen/blink.cmp', version = vim.version.range '1' } }
