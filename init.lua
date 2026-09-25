@@ -65,6 +65,9 @@ vim.o.timeoutlen = 300
 -- Sets the border type for floating windows
 vim.o.winborder = 'rounded'
 
+-- Hides the status bar at the bottom
+vim.o.laststatus = 0
+
 -- Alternative file extension mappings
 vim.filetype.add {
   extension = {
