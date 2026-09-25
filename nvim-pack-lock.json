@@ -4,6 +4,10 @@
       "rev": "9aabcb8396224dcbf8d51c0c1d620d88a46e89d7",
       "src": "https://github.com/okuuva/auto-save.nvim"
     },
+    "barbar.nvim": {
+      "rev": "337ecfadb8bf005050990bf2f624dc4fc828dabd",
+      "src": "https://github.com/romgrk/barbar.nvim"
+    },
     "blink.cmp": {
       "rev": "78336bc89ee5365633bcf754d93df01678b5c08f",
       "src": "https://github.com/saghen/blink.cmp",
