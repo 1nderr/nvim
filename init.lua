@@ -399,6 +399,14 @@ require('nvim-treesitter').install {
   'zsh',
 }
 
+-- Autocommand that starts treesitter for the currently opened file type
+vim.api.nvim_create_autocmd('FileType', {
+  callback = function()
+    pcall(vim.treesitter.start)
+    vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+  end,
+})
+
 -- Scrollbar
 -- Adds a scrollbar to the right side of the window
 vim.pack.add { gh 'petertriho/nvim-scrollbar' }
