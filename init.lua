@@ -287,6 +287,7 @@ require('neoscroll').setup()
 vim.pack.add { gh 'gbprod/nord.nvim' }
 require('nord').setup {
   on_colors = function(colors) colors.polar_night.origin = '#22262F' end,
+  transparent = true,
 }
 
 vim.cmd.colorscheme 'nord'
