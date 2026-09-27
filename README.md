@@ -2,10 +2,10 @@
 
 Personal Neovim configuration
 
-## Clone
+## Symlink
 
 ```sh
-git clone git@github.com:1nderr/nvim.git ~/.config/nvim
+ln -sfn ~/repos/nvim ~/.config/nvim
 ```
 
 ## Installation and Dependencies
