@@ -114,11 +114,8 @@ vim.keymap.set('n', '<leader>dN', '[d', { remap = true, desc = 'Diagnostic Previ
 -- ============================================================
 
 -- nohlsearch turns off highlighting from the last search
--- checktime checks if there buffer was modified outside of Vim
 -- w saves to disk
-function RestoreEsc() vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR><cmd>checktime<CR><cmd>w<CR>') end
-RestoreEsc()
-
+vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR><cmd>w<CR>')
 vim.keymap.set('n', '<leader>l', function() vim.o.relativenumber = not vim.o.relativenumber end, { desc = 'Toggle Relative Lines' })
 vim.keymap.set('n', '<leader>rr', ':%s/', { desc = 'Replace' })
 vim.keymap.set('n', '<leader>rc', ':%s/\\C', { desc = 'Replace (Case Sensitive)' })
@@ -130,21 +127,7 @@ vim.keymap.set('v', 'p', 'P')
 vim.api.nvim_create_autocmd('TextYankPost', {
   desc = 'Highlight when yanking (copying) text',
   group = vim.api.nvim_create_augroup('highlight-yank', { clear = true }),
-  callback = function() vim.hl.on_yank() end,
-})
-
--- Automatically reloads buffer if changes were made outside of Vim
-local function check_file_changed()
-  if vim.fn.mode() == 'n' and vim.bo.buftype == '' then vim.cmd 'silent! checktime' end
-end
-
-local reload_timer = vim.uv.new_timer()
-if reload_timer then reload_timer:start(1000, 1000, vim.schedule_wrap(check_file_changed)) end
-
-vim.api.nvim_create_autocmd({ 'FocusGained', 'BufEnter', 'CursorHold', 'CursorHoldI', 'TermLeave' }, {
-  desc = 'Reload buffers changed outside of Neovim',
-  group = vim.api.nvim_create_augroup('auto-reload', { clear = true }),
-  callback = check_file_changed,
+  callback = function() vim.hl.hl_op() end,
 })
 
 -- ============================================================
