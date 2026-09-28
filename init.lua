@@ -569,7 +569,15 @@ vim.api.nvim_create_autocmd('LspAttach', {
 vim.pack.add { gh 'b0o/schemastore.nvim' }
 
 local servers = {
-  basedpyright = {},
+  basedpyright = {
+    settings = {
+      basedpyright = {
+        analysis = {
+          typeCheckingMode = 'standard',
+        },
+      },
+    },
+  },
 
   bashls = {
     filetypes = { 'sh', 'bash', 'zsh' },
