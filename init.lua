@@ -334,6 +334,11 @@ vim.keymap.set('n', '<leader>e', function()
   }
 end, { desc = 'Explorer' })
 
+-- Snacks
+-- Lots of small plugins included but I just use it for images
+vim.pack.add { gh 'folke/snacks.nvim' }
+require('snacks').setup { image = { enabled = true } }
+
 -- Treesitter
 -- Managers tree-sitter parsers which turn source code into an AST for syntax highlighting and code actions
 vim.pack.add { gh 'nvim-treesitter/nvim-treesitter' }
