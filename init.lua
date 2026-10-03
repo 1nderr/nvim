@@ -284,14 +284,14 @@ vim.api.nvim_set_hl(0, 'CurSearch', { bg = '#616e88', fg = '#D8DEE9' })
 vim.api.nvim_set_hl(0, 'IncSearch', { bg = '#616e88', fg = '#D8DEE9' })
 
 -- Snacks
--- Lots of small plugins included but I just use it for images
+-- A collection of small plugins
 vim.pack.add { gh 'folke/snacks.nvim', gh 'nvim-tree/nvim-web-devicons' }
 local snacks = require 'snacks'
 snacks.setup {
-  gitbrowse = {},
-  explorer = {},
-  image = {},
-  picker = {
+  gitbrowse = {}, -- open files in GitHub
+  explorer = {}, -- file tree
+  image = {}, -- render images
+  picker = { -- search tool
     sources = {
       explorer = {
         hidden = true, -- show dotfiles
@@ -299,11 +299,11 @@ snacks.setup {
         exclude = { '*.gd.uid', '*.tscn' },
         layout = { preset = 'default', preview = true }, -- float instead of sidebar
         jump = { close = true }, -- closes when you open a file
-        auto_close = true,
       },
     },
   },
-  scroll = {},
+  scroll = {}, -- smooth scroll
+  words = {}, -- highlight word you are hovering over
 }
 
 vim.keymap.set('n', '<leader>e', function() snacks.explorer { cwd = vim.fn.getcwd() } end, { desc = 'Explorer' })
@@ -442,35 +442,6 @@ vim.api.nvim_create_autocmd('LspAttach', {
     vim.keymap.set('n', 'F2>', vim.lsp.buf.rename, { buffer = event.buf, desc = 'Rename' })
     vim.keymap.set({ 'n', 'x' }, '<leader>.', vim.lsp.buf.code_action, { buffer = event.buf, desc = 'Code Actions' })
     vim.keymap.set('n', '<leader>i', function() vim.lsp.buf.hover { max_width = 60 } end, { buffer = event.buf, desc = 'Show Info' })
-
-    -- The following autocommands are used to highlight references of the word
-    local client = vim.lsp.get_client_by_id(event.data.client_id)
-    if client and client:supports_method('textDocument/documentHighlight', event.buf) then
-      local highlight_augroup = vim.api.nvim_create_augroup('lsp-highlight', { clear = false })
-
-      -- If cursor is hovering over word, then highlight
-      vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
-        buffer = event.buf,
-        group = highlight_augroup,
-        callback = vim.lsp.buf.document_highlight,
-      })
-
-      -- If the cursor moves, then clear highlights
-      vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
-        buffer = event.buf,
-        group = highlight_augroup,
-        callback = vim.lsp.buf.clear_references,
-      })
-
-      -- If the LSP detaches, then clear highlights
-      vim.api.nvim_create_autocmd('LspDetach', {
-        group = vim.api.nvim_create_augroup('lsp-detach', { clear = true }),
-        callback = function(event2)
-          vim.lsp.buf.clear_references()
-          vim.api.nvim_clear_autocmds { group = 'lsp-highlight', buffer = event2.buf }
-        end,
-      })
-    end
   end,
 })
 
