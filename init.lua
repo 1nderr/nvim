@@ -300,6 +300,9 @@ snacks.setup {
       },
     },
   },
+  terminal = { -- floating terminal
+    win = { position = 'float', border = 'rounded', width = 0.5, height = 0.5 },
+  },
   words = {}, -- highlight word you are hovering over
 }
 
@@ -309,11 +312,11 @@ vim.keymap.set('n', '<leader>sa', function() snacks.picker.grep { regex = false 
 vim.keymap.set('n', '<leader>sr', function() snacks.picker.recent() end, { desc = 'Search Recent Files' })
 vim.keymap.set('n', '<leader>gs', function() snacks.picker.git_status() end, { desc = 'Git Status' })
 vim.keymap.set('n', '<leader>sd', function() snacks.picker.diagnostics() end, { desc = 'Search Diagnostics' })
-vim.keymap.set('n', '<leader><leader>', function() snacks.picker.buffers() end, { desc = 'Buffers' })
 vim.keymap.set('n', 'gd', function() snacks.picker.lsp_definitions() end, { desc = 'Goto Definition' })
 vim.keymap.set('n', 'gr', function() snacks.picker.lsp_references() end, { desc = 'References', nowait = true })
 vim.keymap.set('n', '<leader>ss', function() snacks.picker.lsp_symbols() end, { desc = 'Search Symbols' })
 vim.keymap.set('n', '<leader>go', function() snacks.gitbrowse.open() end, { desc = 'GitHub Open' })
+vim.keymap.set({ 'n', 't' }, '<F8>', function() snacks.terminal.toggle() end, { desc = 'Terminal' })
 
 -- Treesitter
 -- Managers tree-sitter parsers which turn source code into an AST for syntax highlighting and code actions
@@ -393,6 +396,7 @@ require('which-key').setup {
     separator = '',
   },
   spec = {
+    { '<leader>b', group = 'Buffer' },
     { '<leader>s', group = 'Search' },
     { '<leader>g', group = 'Git' },
     { '<leader>d', group = 'Diagnostics' },
@@ -408,6 +412,16 @@ vim.pack.add { gh 'tpope/vim-sleuth' }
 -- Tmux Navigator
 -- Enables seamless jumping between Vim and other tmux panes
 vim.pack.add { gh 'christoomey/vim-tmux-navigator' }
+
+-- Barbar
+-- Buffer tabs along the top with letter-based picking
+vim.pack.add { gh 'romgrk/barbar.nvim' }
+vim.keymap.set('n', '<leader>br', '<cmd>BufferRestore<CR>', { desc = 'Restore Buffer' })
+vim.keymap.set('n', '<leader>bd', '<cmd>BufferClose<CR>', { desc = 'Close Buffer' })
+for i = 1, 9 do
+  vim.keymap.set('n', '<leader>' .. i, '<cmd>BufferGoto ' .. i .. '<CR>')
+  require('which-key').add { '<leader>' .. i, hidden = true }
+end
 
 -- Conform
 -- Code formatter
