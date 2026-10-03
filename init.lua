@@ -153,11 +153,6 @@ vim.api.nvim_create_autocmd('PackChanged', {
     local kind = ev.data.kind
     if kind ~= 'install' and kind ~= 'update' then return end
 
-    if name == 'telescope-fzf-native.nvim' and vim.fn.executable 'make' == 1 then
-      run_build(name, { 'make' }, ev.data.path)
-      return
-    end
-
     if name == 'nvim-treesitter' then
       if not ev.data.active then vim.cmd.packadd 'nvim-treesitter' end
       vim.cmd 'TSUpdate'
@@ -337,7 +332,16 @@ end, { desc = 'Explorer' })
 -- Snacks
 -- Lots of small plugins included but I just use it for images
 vim.pack.add { gh 'folke/snacks.nvim' }
-require('snacks').setup { image = { enabled = true } }
+require('snacks').setup { image = { enabled = true }, picker = { enabled = true } }
+vim.keymap.set('n', '<leader>sf', function() Snacks.picker.files() end, { desc = 'Search Files' })
+vim.keymap.set('n', '<leader>sa', function() Snacks.picker.grep { additional_args = { '--fixed-strings' } } end, { desc = 'Search in All Files' })
+vim.keymap.set('n', '<leader>sr', function() Snacks.picker.recent() end, { desc = 'Search Recent Files' })
+vim.keymap.set('n', '<leader>gs', function() Snacks.picker.git_status() end, { desc = 'Git Status' })
+vim.keymap.set('n', '<leader>sd', function() Snacks.picker.diagnostics() end, { desc = 'Search Diagnostics' })
+vim.keymap.set('n', '<leader><leader>', function() Snacks.picker.buffers() end, { desc = 'Buffers' })
+vim.keymap.set('n', 'gd', function() Snacks.picker.lsp_definitions() end, { desc = 'Goto Definition' })
+vim.keymap.set('n', 'gr', function() Snacks.picker.lsp_references() end, { desc = 'References', nowait = true })
+vim.keymap.set('n', '<leader>ss', function() Snacks.picker.lsp_symbols() end, { desc = 'Search Symbols' })
 
 -- Treesitter
 -- Managers tree-sitter parsers which turn source code into an AST for syntax highlighting and code actions
@@ -345,24 +349,14 @@ vim.pack.add { gh 'nvim-treesitter/nvim-treesitter' }
 require('nvim-treesitter').install {
   'bash',
   'css',
-  'csv',
   'diff',
   'dockerfile',
-  'editorconfig',
-  'gdscript',
-  'gdshader',
-  'git_config',
-  'git_rebase',
-  'gitattributes',
-  'gitcommit',
-  'gitignore',
   'go',
   'godot_resource',
   'gomod',
   'gosum',
   'gotmpl',
   'html',
-  'ini',
   'javascript',
   'jsdoc',
   'json',
@@ -371,19 +365,14 @@ require('nvim-treesitter').install {
   'make',
   'markdown',
   'markdown_inline',
-  'printf',
   'python',
   'query',
   'regex',
-  'requirements',
   'scss',
-  'ssh_config',
-  'toml',
   'typescript',
   'vim',
   'vimdoc',
   'vue',
-  'xml',
   'yaml',
   'zsh',
 }
@@ -413,48 +402,6 @@ vim.pack.add {
 require('spectre').setup {}
 
 vim.keymap.set('n', '<leader>rf', function() require('spectre').toggle() end, { desc = 'Replace in Files' })
-
--- Telescope
--- Enables fzf search across an entire project
-local telescope_plugins = {
-  gh 'nvim-lua/plenary.nvim',
-  gh 'nvim-telescope/telescope.nvim',
-  gh 'nvim-telescope/telescope-ui-select.nvim',
-}
--- Since FZF native is written in C, we need to ensure that make is installed before attempting to install it
-if vim.fn.executable 'make' == 1 then table.insert(telescope_plugins, gh 'nvim-telescope/telescope-fzf-native.nvim') end
-vim.pack.add(telescope_plugins)
-
-require('telescope').setup {
-  defaults = {
-    file_ignore_patterns = {
-      '%.git/',
-      '%.gd%.uid$',
-    },
-    path_display = { 'smart' },
-  },
-  pickers = {
-    find_files = {
-      hidden = true,
-    },
-  },
-  extensions = {
-    ['ui-select'] = { require('telescope.themes').get_dropdown() },
-  },
-}
-
--- Enable Telescope extensions if they are installed
-pcall(require('telescope').load_extension, 'fzf')
-pcall(require('telescope').load_extension, 'ui-select')
-
-local builtin = require 'telescope.builtin'
-vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = 'Search Files' })
-vim.keymap.set('n', '<leader>sa', function() builtin.live_grep { additional_args = { '--fixed-strings' } } end, { desc = 'Search in All Files' })
-vim.keymap.set('n', '<leader>sr', builtin.oldfiles, { desc = 'Search Recent Files' })
-vim.keymap.set('n', '<leader>ss', builtin.lsp_document_symbols, { desc = 'Search Symbols' })
-vim.keymap.set('n', '<leader>sg', builtin.git_status, { desc = 'Search Git Changes' })
-vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = 'Search Diagnostics' })
-vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = 'Buffers' })
 
 -- Which Key
 -- Progressively displays keymaps as you type them
@@ -517,9 +464,7 @@ conform.setup {
 vim.api.nvim_create_autocmd('LspAttach', {
   group = vim.api.nvim_create_augroup('lsp-attach', { clear = true }),
   callback = function(event)
-    vim.keymap.set('n', 'gd', vim.lsp.buf.definition, { buffer = event.buf, desc = 'Go to Definition' })
-    vim.keymap.set('n', 'gD', builtin.lsp_references, { buffer = event.buf, desc = 'Go to Declaration' })
-    vim.keymap.set('n', '<leader><F2>', vim.lsp.buf.rename, { buffer = event.buf, desc = 'Rename' })
+    vim.keymap.set('n', 'F2>', vim.lsp.buf.rename, { buffer = event.buf, desc = 'Rename' })
     vim.keymap.set({ 'n', 'x' }, '<leader>.', vim.lsp.buf.code_action, { buffer = event.buf, desc = 'Code Actions' })
     vim.keymap.set('n', '<leader>i', function() vim.lsp.buf.hover { max_width = 60 } end, { buffer = event.buf, desc = 'Show Info' })
 
