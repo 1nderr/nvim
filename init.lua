@@ -103,7 +103,12 @@ vim.api.nvim_create_autocmd('ColorScheme', {
 -- Shows all diagnostics on the line when the cursor stops
 vim.api.nvim_create_autocmd('CursorHold', {
   group = vim.api.nvim_create_augroup('diagnostic-float', { clear = true }),
-  callback = function() vim.diagnostic.open_float { scope = 'line', focus = false } end,
+  callback = function()
+    -- Don't replace an info/signature float that's already open with a diagnostic
+    local win = vim.b.lsp_floating_preview
+    if win and vim.api.nvim_win_is_valid(win) then return end
+    vim.diagnostic.open_float { scope = 'line', focus = false }
+  end,
 })
 
 vim.keymap.set('n', '<leader>dn', ']d', { remap = true, desc = 'Diagnostic Next' })
@@ -133,17 +138,6 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 -- ============================================================
 -- SECTION 4: PLUGINS
 -- ============================================================
-
-local function run_build(name, cmd, cwd)
-  local result = vim.system(cmd, { cwd = cwd }):wait()
-  if result.code ~= 0 then
-    local stderr = result.stderr or ''
-    local stdout = result.stdout or ''
-    local output = stderr ~= '' and stderr or stdout
-    if output == '' then output = 'No output from build command.' end
-    vim.notify(('Build failed for %s:\n%s'):format(name, output), vim.log.levels.ERROR)
-  end
-end
 
 -- This autocommand runs after a plugin is installed or updated and
 -- runs the appropriate build command for that plugin if necessary
@@ -253,35 +247,37 @@ vim.api.nvim_create_autocmd('FileType', {
 -- Nord
 vim.pack.add { gh 'gbprod/nord.nvim' }
 require('nord').setup {
-  on_colors = function(colors) colors.polar_night.origin = '#22262F' end,
   transparent = true,
+  on_colors = function(colors) colors.polar_night.origin = '#22262F' end,
+  on_highlights = function(hl)
+    hl['@comment'] = { fg = '#616e88', italic = false }
+    hl.Comment = { fg = '#616e88', italic = false }
+    hl['@property'] = { fg = '#88C0D0' }
+    hl['@string'] = { fg = '#A3BE8C' }
+    hl['@variable.parameter'] = { fg = '#D8DEE9' }
+    hl.TabLineSel = { fg = '#D8DEE9', bg = '#22262F' }
+    hl.TabLine = { fg = '#4C566A', bg = '#3B4252' }
+    hl.TabLineFill = { bg = '#3B4252' }
+    hl.GitSignsAddPreview = { bg = '#2a3d2e' }
+    hl.GitSignsAddInline = { bg = '#3a5e42' }
+    hl.GitSignsChangeInline = { bg = '#3a5e42' }
+    hl.GitSignsDeleteVirtLn = { bg = '#3d2a2d' }
+    hl.GitSignsDeleteVirtLnInLine = { bg = '#5e3a3a' }
+    hl.DiffAdd = { bg = '#2a3d2e' }
+    hl.DiffChange = { bg = '#2a3d2e' }
+    hl.DiffDelete = { bg = '#3d2a2d' }
+    hl.DiffText = { bg = '#5e3a3a' }
+    hl.GitConflictCurrent = { bg = '#1d3b35' }
+    hl.GitConflictIncoming = { bg = '#1d3557' }
+    hl.GitConflictCurrentLabel = { bg = '#2d6b5e' }
+    hl.GitConflictIncomingLabel = { bg = '#2d5080' }
+    hl.Search = { bg = '#3B4252' }
+    hl.CurSearch = { bg = '#616e88', fg = '#D8DEE9' }
+    hl.IncSearch = { bg = '#616e88', fg = '#D8DEE9' }
+    hl.SnacksPickerDirectory = { fg = '#D8DEE9' }
+  end,
 }
-
 vim.cmd.colorscheme 'nord'
-vim.api.nvim_set_hl(0, '@comment', { fg = '#616e88', italic = false })
-vim.api.nvim_set_hl(0, 'Comment', { fg = '#616e88', italic = false })
-vim.api.nvim_set_hl(0, '@property', { fg = '#88C0D0' })
-vim.api.nvim_set_hl(0, '@string', { fg = '#A3BE8C' })
-vim.api.nvim_set_hl(0, '@variable.parameter', { fg = '#D8DEE9' })
-vim.api.nvim_set_hl(0, 'TabLineSel', { fg = '#D8DEE9', bg = '#22262F' })
-vim.api.nvim_set_hl(0, 'TabLine', { fg = '#4C566A', bg = '#3B4252' })
-vim.api.nvim_set_hl(0, 'TabLineFill', { bg = '#3B4252' })
-vim.api.nvim_set_hl(0, 'GitSignsAddPreview', { bg = '#2a3d2e' })
-vim.api.nvim_set_hl(0, 'GitSignsAddInline', { bg = '#3a5e42' })
-vim.api.nvim_set_hl(0, 'GitSignsChangeInline', { bg = '#3a5e42' })
-vim.api.nvim_set_hl(0, 'GitSignsDeleteVirtLn', { bg = '#3d2a2d' })
-vim.api.nvim_set_hl(0, 'GitSignsDeleteVirtLnInLine', { bg = '#5e3a3a' })
-vim.api.nvim_set_hl(0, 'DiffAdd', { bg = '#2a3d2e' })
-vim.api.nvim_set_hl(0, 'DiffChange', { bg = '#2a3d2e' })
-vim.api.nvim_set_hl(0, 'DiffDelete', { bg = '#3d2a2d' })
-vim.api.nvim_set_hl(0, 'DiffText', { bg = '#5e3a3a' })
-vim.api.nvim_set_hl(0, 'GitConflictCurrent', { bg = '#1d3b35' })
-vim.api.nvim_set_hl(0, 'GitConflictIncoming', { bg = '#1d3557' })
-vim.api.nvim_set_hl(0, 'GitConflictCurrentLabel', { bg = '#2d6b5e' })
-vim.api.nvim_set_hl(0, 'GitConflictIncomingLabel', { bg = '#2d5080' })
-vim.api.nvim_set_hl(0, 'Search', { bg = '#3B4252' })
-vim.api.nvim_set_hl(0, 'CurSearch', { bg = '#616e88', fg = '#D8DEE9' })
-vim.api.nvim_set_hl(0, 'IncSearch', { bg = '#616e88', fg = '#D8DEE9' })
 
 -- Snacks
 -- A collection of small plugins
@@ -302,13 +298,12 @@ snacks.setup {
       },
     },
   },
-  scroll = {}, -- smooth scroll
   words = {}, -- highlight word you are hovering over
 }
 
 vim.keymap.set('n', '<leader>e', function() snacks.explorer { cwd = vim.fn.getcwd() } end, { desc = 'Explorer' })
 vim.keymap.set('n', '<leader>sf', function() snacks.picker.files() end, { desc = 'Search Files' })
-vim.keymap.set('n', '<leader>sa', function() snacks.picker.grep { additional_args = { '--fixed-strings' } } end, { desc = 'Search in All Files' })
+vim.keymap.set('n', '<leader>sa', function() snacks.picker.grep { regex = false } end, { desc = 'Search in All Files' })
 vim.keymap.set('n', '<leader>sr', function() snacks.picker.recent() end, { desc = 'Search Recent Files' })
 vim.keymap.set('n', '<leader>gs', function() snacks.picker.git_status() end, { desc = 'Git Status' })
 vim.keymap.set('n', '<leader>sd', function() snacks.picker.diagnostics() end, { desc = 'Search Diagnostics' })
@@ -326,6 +321,8 @@ require('nvim-treesitter').install {
   'css',
   'diff',
   'dockerfile',
+  'gdshader',
+  'gdscript',
   'go',
   'godot_resource',
   'gomod',
@@ -360,6 +357,11 @@ vim.api.nvim_create_autocmd('FileType', {
   end,
 })
 
+-- Neoscroll
+-- Enables a very smooth animation when scrolling
+vim.pack.add { gh 'karb94/neoscroll.nvim' }
+require('neoscroll').setup()
+
 -- Scrollbar
 -- Adds a scrollbar to the right side of the window
 vim.pack.add { gh 'petertriho/nvim-scrollbar' }
@@ -392,7 +394,6 @@ require('which-key').setup {
     { '<leader>s', group = 'Search', mode = { 'n', 'v' } },
     { '<leader>g', group = 'Git' },
     { '<leader>d', group = 'Diagnostics' },
-    { '<leader>i', group = 'Info' },
     { '<leader>c', group = 'Conflict' },
     { '<leader>r', group = 'Replace' },
   },
@@ -439,7 +440,7 @@ conform.setup {
 vim.api.nvim_create_autocmd('LspAttach', {
   group = vim.api.nvim_create_augroup('lsp-attach', { clear = true }),
   callback = function(event)
-    vim.keymap.set('n', 'F2>', vim.lsp.buf.rename, { buffer = event.buf, desc = 'Rename' })
+    vim.keymap.set('n', '<F2>', vim.lsp.buf.rename, { buffer = event.buf, desc = 'Rename' })
     vim.keymap.set({ 'n', 'x' }, '<leader>.', vim.lsp.buf.code_action, { buffer = event.buf, desc = 'Code Actions' })
     vim.keymap.set('n', '<leader>i', function() vim.lsp.buf.hover { max_width = 60 } end, { buffer = event.buf, desc = 'Show Info' })
   end,
@@ -616,23 +617,3 @@ for name, server in pairs(servers) do
   vim.lsp.config(name, server)
   vim.lsp.enable(name)
 end
-
--- Godot LSP setup
--- Paths to check for project.godot file in the parent directory
-local paths_to_check = { '/', '/../' }
-local is_godot_project = false
-local godot_project_path = ''
-local cwd = vim.fn.getcwd()
-
--- Iterate over paths and check
-for _, value in pairs(paths_to_check) do
-  if vim.uv.fs_stat(cwd .. value .. 'project.godot') then
-    is_godot_project = true
-    godot_project_path = cwd .. value
-    break
-  end
-end
-
--- Check if server is already running in godot project path and then start the server
-local is_server_running = vim.uv.fs_stat(godot_project_path .. '/server.pipe')
-if is_godot_project and not is_server_running then vim.fn.serverstart(godot_project_path .. '/server.pipe') end
