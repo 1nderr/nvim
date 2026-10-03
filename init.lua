@@ -124,6 +124,8 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR><cmd>w<CR>')
 vim.keymap.set('n', '<leader>l', function() vim.o.relativenumber = not vim.o.relativenumber end, { desc = 'Toggle Relative Lines' })
 vim.keymap.set('n', '<leader>rr', ':%s/', { desc = 'Replace' })
 vim.keymap.set('n', '<leader>rc', ':%s/\\C', { desc = 'Replace (Case Sensitive)' })
+vim.keymap.set('v', '<leader>rr', ':s/', { desc = 'Replace' })
+vim.keymap.set('v', '<leader>rc', ':s/\\C', { desc = 'Replace (Case Sensitive)' })
 
 -- Sets paste to paste and keep register intact
 vim.keymap.set('v', 'p', 'P')
@@ -391,11 +393,11 @@ require('which-key').setup {
     separator = '',
   },
   spec = {
-    { '<leader>s', group = 'Search', mode = { 'n', 'v' } },
+    { '<leader>s', group = 'Search' },
     { '<leader>g', group = 'Git' },
     { '<leader>d', group = 'Diagnostics' },
     { '<leader>c', group = 'Conflict' },
-    { '<leader>r', group = 'Replace' },
+    { '<leader>r', group = 'Replace', mode = { 'n', 'v' } },
   },
 }
 
