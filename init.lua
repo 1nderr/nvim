@@ -283,52 +283,30 @@ vim.api.nvim_set_hl(0, 'Search', { bg = '#3B4252' })
 vim.api.nvim_set_hl(0, 'CurSearch', { bg = '#616e88', fg = '#D8DEE9' })
 vim.api.nvim_set_hl(0, 'IncSearch', { bg = '#616e88', fg = '#D8DEE9' })
 
--- NeoTree
--- Enables a file tree floating window for file navigation
-vim.pack.add {
-  gh 'MunifTanjim/nui.nvim',
-  gh 'nvim-lua/plenary.nvim',
-  gh 'nvim-tree/nvim-web-devicons',
-  { src = gh 'nvim-neo-tree/neo-tree.nvim', version = vim.version.range '3' },
-}
-require('neo-tree').setup {
-  filesystem = {
-    follow_current_file = { enabled = true },
-    filtered_items = {
-      visible = true,
-      hide_dotfiles = false,
-      hide_gitignored = false,
-      never_show_by_pattern = { '*.gd.uid', '*.tscn' },
-    },
-  },
-}
-
--- Runs the :Neotree command with the list of arguments
-vim.keymap.set('n', '<leader>e', function()
-  require('neo-tree.command').execute {
-    action = 'focus',
-    source = 'filesystem',
-    position = 'float',
-
-    -- Opens the tree at the currently open file
-    reveal = true,
-
-    -- Without this, the tree would open at the current file's dir. An issue when you are digging into underlying dependencies
-    dir = vim.fn.getcwd(),
-  }
-end, { desc = 'Explorer' })
-
 -- Snacks
 -- Lots of small plugins included but I just use it for images
-vim.pack.add { gh 'folke/snacks.nvim' }
+vim.pack.add { gh 'folke/snacks.nvim', gh 'nvim-tree/nvim-web-devicons' }
 local snacks = require 'snacks'
 snacks.setup {
   gitbrowse = {},
+  explorer = {},
   image = {},
-  picker = {},
+  picker = {
+    sources = {
+      explorer = {
+        hidden = true, -- show dotfiles
+        ignored = true, -- show gitignored files
+        exclude = { '*.gd.uid', '*.tscn' },
+        layout = { preset = 'default', preview = true }, -- float instead of sidebar
+        jump = { close = true }, -- closes when you open a file
+        auto_close = true,
+      },
+    },
+  },
   scroll = {},
 }
 
+vim.keymap.set('n', '<leader>e', function() snacks.explorer { cwd = vim.fn.getcwd() } end, { desc = 'Explorer' })
 vim.keymap.set('n', '<leader>sf', function() snacks.picker.files() end, { desc = 'Search Files' })
 vim.keymap.set('n', '<leader>sa', function() snacks.picker.grep { additional_args = { '--fixed-strings' } } end, { desc = 'Search in All Files' })
 vim.keymap.set('n', '<leader>sr', function() snacks.picker.recent() end, { desc = 'Search Recent Files' })
