@@ -256,11 +256,6 @@ vim.api.nvim_create_autocmd('FileType', {
   callback = function(ev) vim.keymap.set('n', '<leader>m', '<cmd>MarkdownPreview<CR>', { buffer = ev.buf, desc = 'Markdown Preview' }) end,
 })
 
--- Neoscroll
--- Enables a very smooth animation when scrolling
-vim.pack.add { gh 'karb94/neoscroll.nvim' }
-require('neoscroll').setup()
-
 -- Nord
 vim.pack.add { gh 'gbprod/nord.nvim' }
 require('nord').setup {
@@ -332,16 +327,24 @@ end, { desc = 'Explorer' })
 -- Snacks
 -- Lots of small plugins included but I just use it for images
 vim.pack.add { gh 'folke/snacks.nvim' }
-require('snacks').setup { image = { enabled = true }, picker = { enabled = true } }
-vim.keymap.set('n', '<leader>sf', function() Snacks.picker.files() end, { desc = 'Search Files' })
-vim.keymap.set('n', '<leader>sa', function() Snacks.picker.grep { additional_args = { '--fixed-strings' } } end, { desc = 'Search in All Files' })
-vim.keymap.set('n', '<leader>sr', function() Snacks.picker.recent() end, { desc = 'Search Recent Files' })
-vim.keymap.set('n', '<leader>gs', function() Snacks.picker.git_status() end, { desc = 'Git Status' })
-vim.keymap.set('n', '<leader>sd', function() Snacks.picker.diagnostics() end, { desc = 'Search Diagnostics' })
-vim.keymap.set('n', '<leader><leader>', function() Snacks.picker.buffers() end, { desc = 'Buffers' })
-vim.keymap.set('n', 'gd', function() Snacks.picker.lsp_definitions() end, { desc = 'Goto Definition' })
-vim.keymap.set('n', 'gr', function() Snacks.picker.lsp_references() end, { desc = 'References', nowait = true })
-vim.keymap.set('n', '<leader>ss', function() Snacks.picker.lsp_symbols() end, { desc = 'Search Symbols' })
+local snacks = require 'snacks'
+snacks.setup {
+  gitbrowse = {},
+  image = {},
+  picker = {},
+  scroll = {},
+}
+
+vim.keymap.set('n', '<leader>sf', function() snacks.picker.files() end, { desc = 'Search Files' })
+vim.keymap.set('n', '<leader>sa', function() snacks.picker.grep { additional_args = { '--fixed-strings' } } end, { desc = 'Search in All Files' })
+vim.keymap.set('n', '<leader>sr', function() snacks.picker.recent() end, { desc = 'Search Recent Files' })
+vim.keymap.set('n', '<leader>gs', function() snacks.picker.git_status() end, { desc = 'Git Status' })
+vim.keymap.set('n', '<leader>sd', function() snacks.picker.diagnostics() end, { desc = 'Search Diagnostics' })
+vim.keymap.set('n', '<leader><leader>', function() snacks.picker.buffers() end, { desc = 'Buffers' })
+vim.keymap.set('n', 'gd', function() snacks.picker.lsp_definitions() end, { desc = 'Goto Definition' })
+vim.keymap.set('n', 'gr', function() snacks.picker.lsp_references() end, { desc = 'References', nowait = true })
+vim.keymap.set('n', '<leader>ss', function() snacks.picker.lsp_symbols() end, { desc = 'Search Symbols' })
+vim.keymap.set('n', '<leader>go', function() snacks.gitbrowse.open() end, { desc = 'GitHub Open' })
 
 -- Treesitter
 -- Managers tree-sitter parsers which turn source code into an AST for syntax highlighting and code actions
