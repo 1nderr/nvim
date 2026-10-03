@@ -9,25 +9,6 @@ vim.loader.enable()
 -- Sets the leader key. Must happen before plugins are loaded
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
-
--- Disables the Netrw file explorer
-vim.g.loaded_netrw = 1
-vim.g.loaded_netrwPlugin = 1
-
--- Re-reads the file if it has been changed outside of Vim
-vim.o.autoread = true
-
--- Very long wrapped lines will be visually indented
-vim.o.breakindent = true
-
--- Sync clipboard between OS and Vim
--- Schedule the setting after UiEnter because it can increase startup-time
-vim.schedule(function() vim.o.clipboard = 'unnamedplus' end)
-
--- Case-insensitive searching unless \C or one or more capitall letters in the search term
-vim.o.ignorecase = true
-vim.o.smartcase = true
-
 -- Text replacement appears live as you type
 vim.o.inccommand = 'split'
 
