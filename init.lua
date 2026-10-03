@@ -183,6 +183,7 @@ vim.api.nvim_create_autocmd('User', {
 -- Code auto-complete
 vim.pack.add { { src = gh 'saghen/blink.cmp', version = vim.version.range '1' } }
 require('blink.cmp').setup {
+  signature = { enabled = true, trigger = { show_on_keyword = true } },
   keymap = {
     preset = 'super-tab',
   },
@@ -232,13 +233,6 @@ vim.api.nvim_create_autocmd('User', {
   pattern = 'GitConflictResolved',
   callback = function() vim.diagnostic.enable(true, { bufnr = 0 }) end,
 })
-
--- LSP Signature
--- Displays the function signature as you type the function out
-vim.pack.add { gh 'ray-x/lsp_signature.nvim' }
-require('lsp_signature').setup {
-  hint_enable = false,
-}
 
 -- Markdown Preview
 -- Displays a markdown file in your web browser
