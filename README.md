@@ -19,11 +19,16 @@ mise use -g go node python
 ### Fedora
 
 ```sh
-sudo dnf install neovim fd-find fzf ripgrep tree-sitter-cli gcc
+sudo dnf install neovim fd-find ripgrep tree-sitter-cli gcc ImageMagick
 ```
 
 ### macOS
 
 ```sh
-brew install neovim fd fzf ripgrep tree-sitter-cli
+brew install neovim fd ripgrep tree-sitter-cli imagemagick
 ```
+
+### Terminal
+
+- Use a [Nerd Font](https://www.nerdfonts.com) for file icons
+- Image previews need a terminal with image support (Kitty, WezTerm or Ghostty)
