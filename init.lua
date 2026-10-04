@@ -290,6 +290,7 @@ snacks.setup {
   explorer = {}, -- file tree
   image = {}, -- render images
   picker = { -- search tool
+    hidden = true,
     sources = {
       explorer = {
         hidden = true, -- show dotfiles
@@ -307,8 +308,8 @@ snacks.setup {
 }
 
 vim.keymap.set('n', '<leader>e', function() snacks.explorer { cwd = vim.fn.getcwd() } end, { desc = 'Explorer' })
-vim.keymap.set('n', '<leader>sf', function() snacks.picker.files() end, { desc = 'Search Files' })
-vim.keymap.set('n', '<leader>sa', function() snacks.picker.grep { regex = false } end, { desc = 'Search in All Files' })
+vim.keymap.set('n', '<leader>sf', function() snacks.picker.files { hidden = true } end, { desc = 'Search Files' })
+vim.keymap.set('n', '<leader>sa', function() snacks.picker.grep { hidden = true, regex = false } end, { desc = 'Search in All Files' })
 vim.keymap.set('n', '<leader>sr', function() snacks.picker.recent() end, { desc = 'Search Recent Files' })
 vim.keymap.set('n', '<leader>gs', function() snacks.picker.git_status() end, { desc = 'Git Status' })
 vim.keymap.set('n', '<leader>sd', function() snacks.picker.diagnostics() end, { desc = 'Search Diagnostics' })
