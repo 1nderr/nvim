@@ -34,6 +34,10 @@
       "rev": "f98bae79fd30274524412f7514549d84391d6bb2",
       "src": "https://github.com/selimacerbas/live-server.nvim"
     },
+    "lualine.nvim": {
+      "rev": "221ce6b2d999187044529f49da6554a92f740a96",
+      "src": "https://github.com/nvim-lualine/lualine.nvim"
+    },
     "markdown-preview.nvim": {
       "rev": "faf50b5e233df953a1fd6946d0a8d758bf2e38a1",
       "src": "https://github.com/selimacerbas/markdown-preview.nvim"
@@ -101,6 +105,10 @@
     "vim-tmux-navigator": {
       "rev": "e41c431a0c7b7388ae7ba341f01a0d217eb3a432",
       "src": "https://github.com/christoomey/vim-tmux-navigator"
+    },
+    "vim-tpipeline": {
+      "rev": "2b09c3d3e8f57660e8273083f119d7d3e59a2e1f",
+      "src": "https://github.com/vimpostor/vim-tpipeline"
     },
     "which-key.nvim": {
       "rev": "3aab2147e74890957785941f0c1ad87d0a44c15a",

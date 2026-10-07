@@ -230,6 +230,29 @@ vim.api.nvim_create_autocmd('User', {
   callback = function() vim.diagnostic.enable(true, { bufnr = 0 }) end,
 })
 
+-- Lualine
+-- Displays a status line at the bottom
+vim.g.tpipeline_autoembed = 0
+vim.pack.add {
+  'https://github.com/nvim-tree/nvim-web-devicons',
+  'https://github.com/nvim-lualine/lualine.nvim',
+  'https://github.com/vimpostor/vim-tpipeline',
+}
+require('lualine').setup {
+  options = {
+    component_separators = { left = '', right = '' },
+    section_separators = { left = '', right = '' },
+  },
+  sections = {
+    lualine_a = { 'mode' },
+    lualine_b = { 'branch', 'diff', 'diagnostics' },
+    lualine_c = { 'filename' },
+    lualine_x = {},
+    lualine_y = {},
+    lualine_z = {},
+  },
+}
+
 -- Markdown Preview
 -- Displays a markdown file in your web browser
 vim.pack.add {
