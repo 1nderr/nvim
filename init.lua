@@ -232,7 +232,11 @@ vim.api.nvim_create_autocmd('User', {
 
 -- Lualine
 -- Displays a status line at the bottom
+
+-- Disables the default auto setup of vim-tpipeline. This makes it not override some of the
+-- things I display via the tmux config
 vim.g.tpipeline_autoembed = 0
+
 vim.pack.add {
   'https://github.com/nvim-tree/nvim-web-devicons',
   'https://github.com/nvim-lualine/lualine.nvim',
@@ -252,6 +256,15 @@ require('lualine').setup {
     lualine_z = {},
   },
 }
+
+-- Autocommands that make it so that it doesn't attempt to set the last status after focus has
+-- been regained. Otherwise, a second status bar would show up above the vim-tpipeline one.
+local tpipeline_hide = vim.api.nvim_create_augroup('tpipeline-hide-status', { clear = true })
+local function hide_status()
+  vim.schedule(function() vim.o.laststatus = 0 end)
+end
+vim.api.nvim_create_autocmd({ 'FocusGained' }, { group = tpipeline_hide, callback = hide_status })
+vim.api.nvim_create_autocmd('OptionSet', { group = tpipeline_hide, pattern = 'background', callback = hide_status })
 
 -- Markdown Preview
 -- Displays a markdown file in your web browser
