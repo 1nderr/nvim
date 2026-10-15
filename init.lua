@@ -130,6 +130,14 @@ vim.keymap.set('v', '<leader>rc', ':s/\\C', { desc = 'Replace (Case Sensitive)' 
 -- Sets paste to paste and keep register intact
 vim.keymap.set('v', 'p', 'P')
 
+-- Increment and decrement remaps
+vim.keymap.set('n', '+', '<C-a>', { desc = 'Increment number' })
+vim.keymap.set('n', '-', '<C-x>', { desc = 'Decrement number' })
+vim.keymap.set('v', '+', '<C-a>', { desc = 'Increment selection' })
+vim.keymap.set('v', '-', '<C-x>', { desc = 'Decrement selection' })
+vim.keymap.set('v', 'g+', 'g<C-a>', { desc = 'Progressive increment' })
+vim.keymap.set('v', 'g-', 'g<C-x>', { desc = 'Progressive decrement' })
+
 -- Flashes the line when you yank
 vim.api.nvim_create_autocmd('TextYankPost', {
   desc = 'Highlight when yanking (copying) text',
