@@ -357,6 +357,7 @@ vim.keymap.set('n', '<leader>sa', function() snacks.picker.grep { hidden = true,
 vim.keymap.set('n', '<leader>sr', function() snacks.picker.recent() end, { desc = 'Search Recent Files' })
 vim.keymap.set('n', '<leader>gs', function() snacks.picker.git_status() end, { desc = 'Git Status' })
 vim.keymap.set('n', '<leader>sd', function() snacks.picker.diagnostics() end, { desc = 'Search Diagnostics' })
+vim.keymap.set('n', '<leader>bs', function() snacks.picker.buffers() end, { desc = 'Search Buffers' })
 vim.keymap.set('n', 'gd', function() snacks.picker.lsp_definitions() end, { desc = 'Goto Definition' })
 vim.keymap.set('n', 'gr', function() snacks.picker.lsp_references() end, { desc = 'References', nowait = true })
 vim.keymap.set('n', '<leader>ss', function() snacks.picker.lsp_symbols() end, { desc = 'Search Symbols' })
