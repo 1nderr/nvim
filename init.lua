@@ -24,7 +24,7 @@ vim.o.breakindent = true
 -- Schedule the setting after UiEnter because it can increase startup-time
 vim.schedule(function() vim.o.clipboard = 'unnamedplus' end)
 
--- Case-insensitive searching unless \C or one or more capitall letters in the search term
+-- Case-insensitive searching unless \C or one or more capital letters in the search term
 vim.o.ignorecase = true
 vim.o.smartcase = true
 
@@ -126,6 +126,7 @@ vim.keymap.set('n', '<leader>rr', ':%s/', { desc = 'Replace' })
 vim.keymap.set('n', '<leader>rc', ':%s/\\C', { desc = 'Replace (Case Sensitive)' })
 vim.keymap.set('v', '<leader>rr', ':s/', { desc = 'Replace' })
 vim.keymap.set('v', '<leader>rc', ':s/\\C', { desc = 'Replace (Case Sensitive)' })
+vim.keymap.set('n', '<leader>z', '<cmd>set wrap!<CR>', { desc = 'Toggle wrap' })
 
 -- Sets paste to paste and keep register intact
 vim.keymap.set('v', 'p', 'P')
