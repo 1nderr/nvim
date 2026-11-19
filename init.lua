@@ -20,6 +20,15 @@ vim.o.autoread = true
 -- Very long wrapped lines will be visually indented
 vim.o.breakindent = true
 
+-- Wrap at word boundaries instead of mid-word (the space stays on the previous line)
+vim.o.linebreak = true
+
+-- Indent wrapped list items past their marker (uses 'formatlistpat')
+vim.o.breakindentopt = 'list:-1'
+
+-- Recognize numbered (1. 1) 1:) and bullet (- * +) list markers
+vim.o.formatlistpat = [[^\s*\d\+[\]:.)}\t ]\s*\|^\s*[-*+]\s\+]]
+
 -- Sync clipboard between OS and Vim
 -- Schedule the setting after UiEnter because it can increase startup-time
 vim.schedule(function() vim.o.clipboard = 'unnamedplus' end)
@@ -91,12 +100,18 @@ vim.diagnostic.config {
   virtual_text = { source = 'if_many', spacing = 2, prefix = '' },
 }
 
--- Line highlight colors use the error colors. Runs after each colorscheme change
 vim.api.nvim_create_autocmd('ColorScheme', {
   callback = function()
+    -- Line highlight colors use the error colors. Runs after each colorscheme change
     for _, s in ipairs { 'Error', 'Warn', 'Info', 'Hint' } do
       vim.api.nvim_set_hl(0, 'DiagnosticLine' .. s, { bg = vim.api.nvim_get_hl(0, { name = 'DiagnosticVirtualText' .. s }).bg })
     end
+
+    -- Plain text in csv/tsv files uses the normal text color instead of the string color
+    vim.api.nvim_set_hl(0, '@string.csv', { link = 'Normal' })
+    vim.api.nvim_set_hl(0, '@string.tsv', { link = 'Normal' })
+    -- Gray │ border between csv columns
+    vim.api.nvim_set_hl(0, 'CsvViewDelimiter', { fg = '#616E88' })
   end,
 })
 
@@ -197,6 +212,33 @@ require('blink.cmp').setup {
   },
 }
 
+-- CSV View
+-- Aligns csv/tsv columns into a table and colors each column
+vim.pack.add { gh 'hat0uma/csvview.nvim' }
+require('csvview').setup {
+  -- Draws a │ line between columns instead of showing the commas
+  view = {
+    display_mode = 'border',
+    -- Spaces before and after each │
+    spacing = { left = 1, right = 1 },
+  },
+}
+
+-- Turn the table view on automatically when opening csv/tsv files
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = { 'csv', 'tsv' },
+  callback = function(args) require('csvview').enable(args.buf) end,
+})
+
+-- Alternating row colors in csv/tsv files. Shades every other row, skipping the header
+local csv_stripes = vim.api.nvim_create_namespace 'csv-stripes'
+vim.api.nvim_set_decoration_provider(csv_stripes, {
+  on_win = function(_, _, buf) return vim.bo[buf].filetype == 'csv' or vim.bo[buf].filetype == 'tsv' end,
+  on_line = function(_, _, buf, row)
+    if row > 0 and row % 2 == 0 then vim.api.nvim_buf_set_extmark(buf, csv_stripes, row, 0, { line_hl_group = 'CsvRowStripe', ephemeral = true }) end
+  end,
+})
+
 -- Fidget
 -- Displays notifications and LSP loading messages in the bottom right
 vim.pack.add { gh 'j-hui/fidget.nvim' }
@@ -291,6 +333,13 @@ vim.api.nvim_create_autocmd('FileType', {
   callback = function(ev) vim.keymap.set('n', '<leader>m', '<cmd>MarkdownPreview<CR>', { buffer = ev.buf, desc = 'Markdown Preview' }) end,
 })
 
+-- Render Markdown
+-- Render Markdown inside of Neovim
+vim.pack.add { gh 'MeanderingProgrammer/render-markdown.nvim' }
+require('render-markdown').setup {
+  pipe_table = { grid = true },
+}
+
 -- Nord
 vim.pack.add { gh 'gbprod/nord.nvim' }
 require('nord').setup {
@@ -371,6 +420,7 @@ vim.pack.add { gh 'nvim-treesitter/nvim-treesitter' }
 require('nvim-treesitter').install {
   'bash',
   'css',
+  'csv',
   'diff',
   'dockerfile',
   'gdshader',
@@ -393,6 +443,7 @@ require('nvim-treesitter').install {
   'query',
   'regex',
   'scss',
+  'tsv',
   'typescript',
   'vim',
   'vimdoc',
