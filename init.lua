@@ -17,6 +17,9 @@ vim.g.loaded_netrwPlugin = 1
 -- Re-reads the file if it has been changed outside of Vim
 vim.o.autoread = true
 
+-- Long lines run off-screen instead of wrapping
+vim.o.wrap = false
+
 -- Very long wrapped lines will be visually indented
 vim.o.breakindent = true
 
@@ -206,6 +209,8 @@ require('blink.cmp').setup {
   signature = { enabled = true, trigger = { show_on_keyword = true } },
   keymap = {
     preset = 'super-tab',
+    ['<C-j>'] = { 'select_next', 'fallback' },
+    ['<C-k>'] = { 'select_prev', 'fallback' },
   },
   completion = {
     menu = { border = 'none' },
@@ -337,6 +342,7 @@ vim.api.nvim_create_autocmd('FileType', {
 -- Render Markdown inside of Neovim
 vim.pack.add { gh 'MeanderingProgrammer/render-markdown.nvim' }
 require('render-markdown').setup {
+  anti_conceal = { enabled = false },
   pipe_table = { grid = true },
 }
 
