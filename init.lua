@@ -209,8 +209,6 @@ require('blink.cmp').setup {
   signature = { enabled = true, trigger = { show_on_keyword = true } },
   keymap = {
     preset = 'super-tab',
-    ['<C-j>'] = { 'select_next', 'fallback' },
-    ['<C-k>'] = { 'select_prev', 'fallback' },
   },
   completion = {
     menu = { border = 'none' },
@@ -343,8 +341,6 @@ vim.api.nvim_create_autocmd('FileType', {
 vim.pack.add { gh 'MeanderingProgrammer/render-markdown.nvim' }
 local function setup_render_markdown()
   require('render-markdown').setup {
-    anti_conceal = { enabled = false },
-    -- Only wrap table cells when the window itself wraps
     pipe_table = { grid = true, wrap = vim.o.wrap },
   }
 end
