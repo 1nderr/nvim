@@ -532,7 +532,6 @@ conform.setup {
     javascript = { 'prettierd', 'prettier', stop_after_first = true },
     json = { 'prettierd', 'prettier', stop_after_first = true },
     lua = { 'stylua' },
-    markdown = { 'prettierd', 'prettier', stop_after_first = true },
     python = { 'ruff_fix', 'ruff_organize_imports', 'ruff_format' },
     sh = { 'shfmt' },
     typescript = { 'prettierd', 'prettier', stop_after_first = true },
