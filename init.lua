@@ -341,10 +341,25 @@ vim.api.nvim_create_autocmd('FileType', {
 -- Render Markdown
 -- Render Markdown inside of Neovim
 vim.pack.add { gh 'MeanderingProgrammer/render-markdown.nvim' }
-require('render-markdown').setup {
-  anti_conceal = { enabled = false },
-  pipe_table = { grid = true },
-}
+local function setup_render_markdown()
+  require('render-markdown').setup {
+    anti_conceal = { enabled = false },
+    -- Only wrap table cells when the window itself wraps
+    pipe_table = { grid = true, wrap = vim.o.wrap },
+  }
+end
+setup_render_markdown()
+
+-- Re-apply the table wrap setting whenever wrap is toggled (e.g. <leader>z)
+vim.api.nvim_create_autocmd('OptionSet', {
+  pattern = 'wrap',
+  desc = 'Sync render-markdown table wrap with wrap',
+  callback = function()
+    if vim.bo.filetype ~= 'markdown' then return end
+    setup_render_markdown()
+    require('render-markdown.api').render { buf = vim.api.nvim_get_current_buf() }
+  end,
+})
 
 -- Nord
 vim.pack.add { gh 'gbprod/nord.nvim' }
